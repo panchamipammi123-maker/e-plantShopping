@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addItem } from "../redux/CartSlice"; // Adjust path if different
+import "./App.css"; // for navbar
 
 const plants = [
   {
@@ -46,33 +49,54 @@ const plants = [
 ];
 
 function ProductList() {
-  const [cart, setCart] = useState([]);
+  const dispatch = useDispatch();
+  const [addedToCart, setAddedToCart] = useState([]);
 
   const handleAddToCart = (plant) => {
-    setCart([...cart, plant]);
+    dispatch(addItem(plant));
+    setAddedToCart([...addedToCart, plant.id]);
   };
+
+  const categories = ["Indoor", "Outdoor", "Succulents"];
 
   return (
     <div>
-      <nav>
-        <a href="#">Home</a>
-        <a href="#">Plants</a>
-        <a href="#">Cart</a>
-        <span>Cart ({cart.length})</span>
+      <nav className="navbar">
+        <a href="#home">Home</a>
+        <a href="#plants">Plants</a>
+        <a href="#cart">Cart</a>
+        <span>Cart ({addedToCart.length})</span>
       </nav>
 
-      <h2>Houseplants</h2>
-      {plants.map((plant) => (
-        <div key={plant.id}>
-          <img src={plant.image} alt={plant.name} width="100" />
-          <h3>{plant.name}</h3>
-          <p>₹{plant.price}</p>
-          <button
-            onClick={() => handleAddToCart(plant)}
-            disabled={cart.some((item) => item.id === plant.id)}
-          >
-            Add to Cart
-          </button>
+      <h1>Paradise Nursery Plants</h1>
+
+      {categories.map((cat) => (
+        <div key={cat} style={{ margin: "20px 0" }}>
+          <h2>{cat} Plants</h2>
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {plants
+              .filter((plant) => plant.category === cat)
+              .map((plant) => (
+                <div key={plant.id} style={{ margin: "10px" }}>
+                  <img
+                    src={plant.image}
+                    alt={plant.name}
+                    width="100"
+                    height="100"
+                  />
+                  <h3>{plant.name}</h3>
+                  <p>₹{plant.price}</p>
+                  <button
+                    onClick={() => handleAddToCart(plant)}
+                    disabled={addedToCart.includes(plant.id)}
+                  >
+                    {addedToCart.includes(plant.id)
+                      ? "Added to Cart"
+                      : "Add to Cart"}
+                  </button>
+                </div>
+              ))}
+          </div>
         </div>
       ))}
     </div>
